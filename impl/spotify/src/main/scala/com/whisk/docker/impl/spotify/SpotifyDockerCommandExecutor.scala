@@ -116,13 +116,14 @@ class SpotifyDockerCommandExecutor(override val host: String, client: DockerClie
               } yield {
                 ip
               }
-
+              val health = Option(info.state().health()).map(_.status())
               Future.successful(
                 Some(
                   InspectContainerResult(info.state().running(),
                                          ports,
                                          info.name(),
-                                         addresses.toSeq)))
+                                         addresses.toSeq,
+                                         health)))
             case None =>
               Future.failed(new Exception("can't extract ports"))
           }

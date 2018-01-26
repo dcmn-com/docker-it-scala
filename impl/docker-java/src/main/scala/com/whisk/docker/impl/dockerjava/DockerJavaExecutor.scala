@@ -112,10 +112,13 @@ class DockerJavaExecutor(override val host: String, client: DockerClient)
         ip
       }
 
+      val health = Option(result.getState.getHealth).map(_.getStatus)
+
       InspectContainerResult(running = true,
                              ports = portMap,
                              name = result.getName,
-                             ipAddresses = addresses.toSeq)
+                             ipAddresses = addresses.toSeq,
+                             health = health)
     })
     RetryUtils.looped(
       future.flatMap {

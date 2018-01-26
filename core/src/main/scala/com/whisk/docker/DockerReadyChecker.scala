@@ -149,6 +149,12 @@ object DockerReadyChecker {
     }
   }
 
+  case class HealthReadyCheck(targetHealth: String = "healthy") extends DockerReadyChecker {
+    override def apply(container: DockerContainerState)(implicit docker: DockerCommandExecutor,
+                                                        ec: ExecutionContext): Future[Boolean] =
+      container.getHealth().map(_.equals(targetHealth))
+  }
+
   private[docker] case class TimeLimited(underlying: DockerReadyChecker, duration: FiniteDuration)
       extends DockerReadyChecker {
 

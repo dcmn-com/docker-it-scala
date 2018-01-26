@@ -90,6 +90,13 @@ class DockerContainerState(spec: DockerContainer) {
     case None      => Future.failed(new RuntimeException(s"Container ${spec.image} is not running"))
   }
 
+  def getHealth()(implicit docker: DockerCommandExecutor,
+                  ec: ExecutionContext): Future[Option[String]] =
+    getRunningContainer().flatMap {
+      case Some(res) => Future.successful(res.health)
+      case None      => Future.failed(new RuntimeException(s"Container ${spec.image} is not running"))
+    }
+
   private val _ports = SinglePromise[Map[Int, Int]]
 
   def getPorts()(implicit docker: DockerCommandExecutor,
